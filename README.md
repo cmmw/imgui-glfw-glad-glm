@@ -10,6 +10,7 @@ The major and minor part of the version number is analogous to GLFW, the patch v
 
 | Release   | GLFW      | ImGui     | Glad                  |
 |   ---     |   ---     |   ---     |   ---                 |
+| v3.3.1    | v3.3.4    | v1.83     | 2.0.0 (gl 4.5 / core) |
 | v3.3.0    | v3.3.3    | v1.81     | 2.0.0 (gl 4.5 / core) |
 
 ### Example
