@@ -32,10 +32,12 @@ include(FetchContent)
 
 # ...
 
+# Use static libraries
+set(BUILD_SHARED_LIBS OFF)
 FetchContent_Declare(
         imgui-glfw-glad
         GIT_REPOSITORY https://github.com/cmmw/imgui-glfw-glad.git
-        GIT_TAG v3.3.0
+        GIT_TAG v3.3.3
 )
 
 FetchContent_MakeAvailable(imgui-glfw-glad)
@@ -45,23 +47,34 @@ add_executable(
         main.cpp
 )
 
-# It is sufficient to only link ImGui as it already contains Glad and GLFW
+# It is sufficient to only link glm and ImGui since the latter one already contains Glad and GLFW
 target_link_libraries(
         app
         imgui
+        glm
 )
 
-# Otherwise link only Glad and GLFW if ImGui is not needed
+# Otherwise link only Glad, GLFW and glm if ImGui is not needed
 target_link_libraries(
         app
         glfw
         glad
+        glm
 )
 
 ```
 
-If preferred, the libraries can be built separately and included in your
-projects.
+The folder example provides a minimal, self-contained sample program which 
+includes this project via FetchContent and does all the necessary 
+initialization of the components. In order to build it, create a build 
+folder inside the example directory, cd into it and execute
+
+```shell
+cmake .. -G "<Generator of your choice>"
+cmake --build . --target app
+```
+
+If preferred, libraries can be built separately and included in your projects.
 
 ### License
 
