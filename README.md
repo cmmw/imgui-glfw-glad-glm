@@ -1,22 +1,31 @@
 # imgui-glfw-glad
 
-A CMake project for [GLFW](https://github.com/glfw/glfw), [Glad](https://gen.glad.sh/) and [ImGui](https://github.com/ocornut/imgui).
+A CMake project for [GLFW](https://github.com/glfw/glfw)
+, [Glad](https://gen.glad.sh/), [ImGui](https://github.com/ocornut/imgui) and
+[glm](https://github.com/g-truc/glm).
 
-This project is meant to simplify the import of the OpenGL related libraries GLFW, ImGui and Glad. GLFW is included via CMake's FetchContent and ImGui is contained as a git submodule (wrapped by simple CMake project). Glad is added manually via source code.
+This project is meant to simplify the import of the OpenGL related libraries
+GLFW, ImGui, Glad and glm. GLFW and glm are included via CMake's FetchContent
+whereas ImGui is imported as a git submodule (wrapped by simple CMake project).
+Glad is added manually via source code.
 
 ### Versioning
 
-The major and minor part of the version number is analogous to GLFW, the patch version is incremented whenever the project is updated. The following list contains detailed information of the versions used in each release:
+The major and minor part of the version number is analogous to GLFW, the patch
+version is incremented whenever the project is updated. The following list
+contains detailed information of the versions used in each release:
 
-| Release   | GLFW      | ImGui     | Glad                  |
-|   ---     |   ---     |   ---     |   ---                 |
-| v3.3.2    | v3.3.5    | v1.85     | 2.0.0 (gl 4.5 / core) |
-| v3.3.1    | v3.3.4    | v1.83     | 2.0.0 (gl 4.5 / core) |
-| v3.3.0    | v3.3.3    | v1.81     | 2.0.0 (gl 4.5 / core) |
+| Release | GLFW   | ImGui | Glad                  | glm     |
+|---------|--------|-------|-----------------------|---------|
+| v3.3.3  | v3.3.5 | v1.85 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.2  | v3.3.5 | v1.85 | 2.0.0 (gl 4.5 / core) | N/A     |
+| v3.3.1  | v3.3.4 | v1.83 | 2.0.0 (gl 4.5 / core) | N/A     |
+| v3.3.0  | v3.3.3 | v1.81 | 2.0.0 (gl 4.5 / core) | N/A     |
 
 ### Example
 
-In order to use the libraries, simply include this project with CMake's FetchContent:
+In order to use the libraries, simply include this project with CMake's
+FetchContent:
 
 ```cmake
 include(FetchContent)
@@ -51,8 +60,12 @@ target_link_libraries(
 
 ```
 
-If preferred, the libraries can be built separately and included in your projects.
+If preferred, the libraries can be built separately and included in your
+projects.
 
 ### License
 
-The content of this project (excluding 3rd party libraries) is licensed under the [MIT license](https://github.com/cmmw/imgui-glfw-glad/blob/master/LICENSE.md). Please refer to the particular libraries homepage/repository for more information regarding licensing.
+The content of this project (excluding 3rd party libraries) is licensed under
+the [MIT license](https://github.com/cmmw/imgui-glfw-glad/blob/master/LICENSE.md)
+. Please refer to the particular libraries homepage/repository for more
+information regarding licensing.
