@@ -17,6 +17,7 @@ contains detailed information of the versions used in each release:
 
 | Release | GLFW   | ImGui | Glad                  | glm     |
 |---------|--------|-------|-----------------------|---------|
+| v3.3.4  | v3.3.6 | v1.85 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
 | v3.3.3  | v3.3.5 | v1.85 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
 | v3.3.2  | v3.3.5 | v1.85 | 2.0.0 (gl 4.5 / core) | N/A     |
 | v3.3.1  | v3.3.4 | v1.83 | 2.0.0 (gl 4.5 / core) | N/A     |
@@ -35,12 +36,12 @@ include(FetchContent)
 # Use static libraries
 set(BUILD_SHARED_LIBS OFF)
 FetchContent_Declare(
-        imgui-glfw-glad
-        GIT_REPOSITORY https://github.com/cmmw/imgui-glfw-glad.git
-        GIT_TAG v3.3.3
+        imgui-glfw-glad-glm
+        GIT_REPOSITORY https://github.com/cmmw/imgui-glfw-glad-glm.git
+        GIT_TAG v3.3.4
 )
 
-FetchContent_MakeAvailable(imgui-glfw-glad)
+FetchContent_MakeAvailable(imgui-glfw-glad-glm)
 
 add_executable(
         app
@@ -64,10 +65,10 @@ target_link_libraries(
 
 ```
 
-The folder example provides a minimal, self-contained sample program which 
-includes this project via FetchContent and does all the necessary 
-initialization of the components. In order to build it, create a build 
-folder inside the example directory, cd into it and execute
+The folder example provides a minimal, self-contained sample program which
+includes this project via FetchContent and does all the necessary initialization
+of the components. In order to build it, create a build folder inside the
+example directory, cd into it and execute
 
 ```shell
 cmake .. -G "<Generator of your choice>"

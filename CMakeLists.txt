@@ -1,13 +1,13 @@
 include(FetchContent)
 cmake_minimum_required(VERSION 3.17)
 
-project(imgui_glfw_glad)
+project(imgui-glfw-glad-glm)
 
 set(CMAKE_CXX_STANDARD 17)
 FetchContent_Declare(
         glfw
         GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG 3.3.5
+        GIT_TAG 3.3.6
 )
 FetchContent_Declare(
         glm
