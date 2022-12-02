@@ -15,19 +15,20 @@ The major and minor part of the version number is analogous to GLFW, the patch
 version is incremented whenever the project is updated. The following list
 contains detailed information of the versions used in each release:
 
-| Release | GLFW   | ImGui | Glad                  | glm     |
-|---------|--------|-------|-----------------------|---------|
-| v3.3.10 | v3.3.8 | v1.89 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.9  | v3.3.8 | v1.88 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.8  | v3.3.7 | v1.88 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.7  | v3.3.7 | v1.87 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.6  | v3.3.6 | v1.87 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.5  | v3.3.6 | v1.86 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.4  | v3.3.6 | v1.85 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.3  | v3.3.5 | v1.85 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.2  | v3.3.5 | v1.85 | 2.0.0 (gl 4.5 / core) | N/A     |
-| v3.3.1  | v3.3.4 | v1.83 | 2.0.0 (gl 4.5 / core) | N/A     |
-| v3.3.0  | v3.3.3 | v1.81 | 2.0.0 (gl 4.5 / core) | N/A     |
+| Release | GLFW   | ImGui   | Glad                  | glm     |
+|---------|--------|---------|-----------------------|---------|
+| v3.3.11 | v3.3.8 | v1.89.1 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.10 | v3.3.8 | v1.89   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.9  | v3.3.8 | v1.88   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.8  | v3.3.7 | v1.88   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.7  | v3.3.7 | v1.87   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.6  | v3.3.6 | v1.87   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.5  | v3.3.6 | v1.86   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.4  | v3.3.6 | v1.85   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.3  | v3.3.5 | v1.85   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
+| v3.3.2  | v3.3.5 | v1.85   | 2.0.0 (gl 4.5 / core) | N/A     |
+| v3.3.1  | v3.3.4 | v1.83   | 2.0.0 (gl 4.5 / core) | N/A     |
+| v3.3.0  | v3.3.3 | v1.81   | 2.0.0 (gl 4.5 / core) | N/A     |
 
 ### Example
 
