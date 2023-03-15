@@ -17,6 +17,7 @@ contains detailed information of the versions used in each release:
 
 | Release | GLFW   | ImGui   | Glad                  | glm     |
 |---------|--------|---------|-----------------------|---------|
+| v3.3.14 | v3.3.8 | v1.89.4 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
 | v3.3.13 | v3.3.8 | v1.89.3 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
 | v3.3.12 | v3.3.8 | v1.89.2 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
 | v3.3.11 | v3.3.8 | v1.89.1 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
