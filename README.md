@@ -4,34 +4,23 @@ A CMake project for [GLFW](https://github.com/glfw/glfw)
 , [Glad](https://gen.glad.sh/), [ImGui](https://github.com/ocornut/imgui) and
 [glm](https://github.com/g-truc/glm).
 
-This project is meant to simplify the import of the OpenGL related libraries
-GLFW, ImGui, Glad and glm. GLFW and glm are included via CMake's FetchContent
-whereas ImGui is imported as a git submodule (wrapped by simple CMake project).
-Glad is added manually via source code.
+This project is meant to simplify the import of the OpenGL related libraries GLFW, ImGui, Glad and glm. ImGui, GLFW and
+glm are imported via CMake's FetchContent. Additionally, a target is created for ImGui which is built with the glfw
+backend and using glad's loader. The gl extensions are generated and downloaded from https://gen.glad.sh/ during
+configuration. A fallback version of glad's gl extensions for gl version 4.5 core profile is included in this project
+and will be used in case curl is not available.
 
-### Versioning
+There are a number of cache variables to customize the behaviour of the dependency import:
 
-The major and minor part of the version number is analogous to GLFW, the patch
-version is incremented whenever the project is updated. The following list
-contains detailed information of the versions used in each release:
-
-| Release | GLFW   | ImGui   | Glad                  | glm     |
-|---------|--------|---------|-----------------------|---------|
-| v3.3.14 | v3.3.8 | v1.89.4 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.13 | v3.3.8 | v1.89.3 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.12 | v3.3.8 | v1.89.2 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.11 | v3.3.8 | v1.89.1 | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.10 | v3.3.8 | v1.89   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.9  | v3.3.8 | v1.88   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.8  | v3.3.7 | v1.88   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.7  | v3.3.7 | v1.87   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.6  | v3.3.6 | v1.87   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.5  | v3.3.6 | v1.86   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.4  | v3.3.6 | v1.85   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.3  | v3.3.5 | v1.85   | 2.0.0 (gl 4.5 / core) | 0.9.9.8 |
-| v3.3.2  | v3.3.5 | v1.85   | 2.0.0 (gl 4.5 / core) | N/A     |
-| v3.3.1  | v3.3.4 | v1.83   | 2.0.0 (gl 4.5 / core) | N/A     |
-| v3.3.0  | v3.3.3 | v1.81   | 2.0.0 (gl 4.5 / core) | N/A     |
+| Variable            | Type   | Default             | Description                                        |
+|---------------------|--------|---------------------|----------------------------------------------------|
+| IGG_COMPONENTS      | list   | IMGUI;GLFW;GLAD;GLM | The components to import                           |
+| IGG_GLAD_DOWNLOAD   | bool   | ON                  | Download glad or use fallback version              |
+| IGG_GLAD_GL_CORE    | bool   | ON                  | If gl core or compatibility profile should be used |
+| IGG_GLAD_GL_VERSION | string | 4.5                 | The gl version used by the glad loader generator   |
+| IGG_IMGUI_TAG       | string | master              | The git tag of the ImGui project to import         |
+| IGG_GLFW_TAG        | string | master              | The git tag of the GLFW project to import          |
+| IGG_GLM_TAG         | string | master              | The git tag of the glm project to import           |
 
 ### Example
 
@@ -43,12 +32,10 @@ include(FetchContent)
 
 # ...
 
-# Use static libraries
-set(BUILD_SHARED_LIBS OFF)
 FetchContent_Declare(
         imgui-glfw-glad-glm
         GIT_REPOSITORY https://github.com/cmmw/imgui-glfw-glad-glm.git
-        GIT_TAG v3.3.4
+        GIT_TAG v4.0.0
 )
 
 FetchContent_MakeAvailable(imgui-glfw-glad-glm)
@@ -75,17 +62,49 @@ target_link_libraries(
 
 ```
 
-The folder example provides a minimal, self-contained sample program which
-includes this project via FetchContent and does all the necessary initialization
-of the components. In order to build it, create a build folder inside the
-example directory, cd into it and execute
+The folder example provides a minimal, self-contained sample program which includes this project via FetchContent and
+does all the necessary initialization of the components. In order to build it, execute the following commands from
+within the source folder:
 
 ```shell
-cmake .. -G "<Generator of your choice>"
-cmake --build . --target app
+cmake -S . -B build -DIGG_GLFW_TAG=v3.3.8 -DIGG_GLAD_GL_VERSION=4.6
+cmake --build build --target app -j4
 ```
 
-If preferred, libraries can be built separately and included in your projects.
+The list of the components to be imported has to be put in quotes and seperated by semicolons:
+
+```shell
+cmake -S . -B build -DIGG_COMPONENTS="GLM;GLFW"
+cmake --build build --target app -j4
+```
+
+Sometimes it's handy to enable the output of FetchContent:
+
+```shell
+cmake -S . -B build -DFETCHCONTENT_QUIET=OFF
+```
+
+### Reduce configuration time
+
+The first time cmake is executed to generate the build system will take some time since all the components specified in
+the `IGG_COMPONENTS` variable (except glad if selected otherwise) have to be downloaded. Further reconfigurations will
+not download anything if not necessary but populating the projects will still take some time.
+
+To avoid this the CMake variable `FETCHCONTENT_FULLY_DISCONNECTED`  can be set `ON`. This will prevent CMake to update
+or download any content. Be careful if you use `FetchContent` anywhere else in your project and conduct the CMake
+documentation to understand the implications.
+Alternatively, `FETCHCONTENT_UPDATES_DISCONNECTED_<uppercaseName>` can be set per component to disabled updates. These
+variables will be cached, it is sufficient to set them once after the initial generation of the build system.
+
+```shell
+cmake -S . -B build -DFETCHCONTENT_UPDATES_DISCONNECTED_GLFW=OFF
+```
+
+or
+
+```shell
+cmake -S . -B build -DFETCHCONTENT_FULLY_DISCONNECTED=OFF
+```
 
 ### License
 

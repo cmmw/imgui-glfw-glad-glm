@@ -12,6 +12,11 @@ foreach (comp IN ITEMS ${IGG_COMPONENTS})
     set(IMPORT_${comp} ON)
 endforeach ()
 
+if (IMPORT_IMGUI)
+    set(IMPORT_GLAD ON)
+    set(IMPORT_GLFW ON)
+endif ()
+
 if (IMPORT_GLAD)
     option(IGG_GLAD_DOWNLOAD "If set to ON glad gl extensions will be generated and downloaded if OFF the included version (gl4.5/core) will be used" ON)
     if (IGG_GLAD_DOWNLOAD)
