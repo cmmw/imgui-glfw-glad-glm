@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD 17)
 FetchContent_Declare(
         imgui-glfw-glad-glm
         GIT_REPOSITORY https://github.com/cmmw/imgui-glfw-glad-glm.git
-        GIT_TAG v4.0.0
 )
 FetchContent_MakeAvailable(imgui-glfw-glad-glm)
 

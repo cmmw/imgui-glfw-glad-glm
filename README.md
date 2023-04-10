@@ -1,5 +1,7 @@
 # imgui-glfw-glad
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+
 A CMake project for [GLFW](https://github.com/glfw/glfw)
 , [Glad](https://gen.glad.sh/), [ImGui](https://github.com/ocornut/imgui) and
 [glm](https://github.com/g-truc/glm).
@@ -22,7 +24,7 @@ There are a number of cache variables to customize the behaviour of the dependen
 | IGG_GLFW_TAG        | string | master              | The git tag of the GLFW project to import          |
 | IGG_GLM_TAG         | string | master              | The git tag of the glm project to import           |
 
-### Example
+## Example
 
 In order to use the libraries, simply include this project with CMake's
 FetchContent:
@@ -62,7 +64,7 @@ target_link_libraries(
 
 ```
 
-The folder example provides a minimal, self-contained sample program which includes this project via FetchContent and
+The folder example provides a minimal, self-contained example program which includes this project via FetchContent and
 does all the necessary initialization of the components. In order to build it, execute the following commands from
 within the source folder:
 
@@ -84,7 +86,7 @@ Sometimes it's handy to enable the output of FetchContent:
 cmake -S . -B build -DFETCHCONTENT_QUIET=OFF
 ```
 
-### Reduce configuration time
+## Reducing configuration time
 
 The first time cmake is executed to generate the build system will take some time since all the components specified in
 the `IGG_COMPONENTS` variable (except glad if selected otherwise) have to be downloaded. Further reconfigurations will
@@ -97,16 +99,16 @@ Alternatively, `FETCHCONTENT_UPDATES_DISCONNECTED_<uppercaseName>` can be set pe
 variables will be cached, it is sufficient to set them once after the initial generation of the build system.
 
 ```shell
-cmake -S . -B build -DFETCHCONTENT_UPDATES_DISCONNECTED_GLFW=OFF
+cmake -S . -B build -DFETCHCONTENT_UPDATES_DISCONNECTED_GLFW=ON
 ```
 
 or
 
 ```shell
-cmake -S . -B build -DFETCHCONTENT_FULLY_DISCONNECTED=OFF
+cmake -S . -B build -DFETCHCONTENT_FULLY_DISCONNECTED=ON
 ```
 
-### License
+## License
 
 The content of this project (excluding 3rd party libraries) is licensed under
 the [MIT license](https://github.com/cmmw/imgui-glfw-glad/blob/master/LICENSE.md)
