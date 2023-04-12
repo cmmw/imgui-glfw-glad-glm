@@ -69,15 +69,20 @@ does all the necessary initialization of the components. In order to build it, e
 within the source folder:
 
 ```shell
-cmake -S . -B build -DIGG_GLFW_TAG=v3.3.8 -DIGG_GLAD_GL_VERSION=4.6
+cmake -S . -B build
 cmake --build build --target app -j4
+```
+
+If you want to define the version of a dependency:
+
+```shell
+cmake -S. -B build -DIGG_GLFW_TAG=v3.3.8 -DIGG_GLAD_GL_VERSION=4.6
 ```
 
 The list of the components to be imported has to be put in quotes and seperated by semicolons:
 
 ```shell
 cmake -S . -B build -DIGG_COMPONENTS="GLM;GLFW"
-cmake --build build --target app -j4
 ```
 
 Sometimes it's handy to enable the output of FetchContent:
@@ -98,11 +103,13 @@ documentation to understand the implications.
 Alternatively, `FETCHCONTENT_UPDATES_DISCONNECTED_<uppercaseName>` can be set per component to disabled updates. These
 variables will be cached, it is sufficient to set them once after the initial generation of the build system.
 
+Disabling updates for GLFW:
+
 ```shell
 cmake -S . -B build -DFETCHCONTENT_UPDATES_DISCONNECTED_GLFW=ON
 ```
 
-or
+Disabling updates and downloads for every dependency imported with `FetchContent`:
 
 ```shell
 cmake -S . -B build -DFETCHCONTENT_FULLY_DISCONNECTED=ON
