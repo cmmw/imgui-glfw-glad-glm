@@ -79,6 +79,9 @@ if (IMPORT_GLAD)
                 else ()
                     string(REGEX REPLACE "/$" "" location ${location})
                     string(APPEND location "/glad.zip")
+                    if (NOT ${location} MATCHES "^http")
+                        string(PREPEND location "https://gen.glad.sh")
+                    endif ()
                     message(STATUS "Downloading glad for gl ${IGG_GLAD_GL_VERSION}/${GLAD_GL_PROFILE} from ${location} ")
                     FetchContent_Declare(
                             glad
