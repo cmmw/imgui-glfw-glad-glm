@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 include(FetchContent)
 
-project(imgui-glfw-glad-glm VERSION 4.0.0)
+project(imgui-glfw-glad-glm VERSION 4.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -58,7 +58,7 @@ endif ()
 ##############################
 if (IMPORT_GLAD)
     if (NOT IGG_GLAD_DOWNLOAD)
-        message(STATUS "Using included version of glad loader (gl 4.5/core) ")
+        message(STATUS "Using included version of the glad loader sources (gl 4.5/core) ")
         set(glad_SOURCE_DIR glad)
     else ()
         if ("${glad_INSTALLED_VERSION}" STREQUAL "${IGG_GLAD_GL_VERSION}-${GLAD_GL_PROFILE}")
@@ -67,29 +67,44 @@ if (IMPORT_GLAD)
         else ()
             find_program(IGG_CURL NAMES curl curl.exe)
             if (NOT IGG_CURL)
-                message(STATUS "Could not find curl, using included version of the glad loader (gl 4.5/core)")
+                message(STATUS "Could not find curl, using included version of the glad loader sources (gl 4.5/core)")
                 set(glad_SOURCE_DIR glad)
             else ()
-                execute_process(COMMAND ${IGG_CURL} -s -D - -X POST -d generator=c&api=egl%3Dnone&api=gl%3D4.5&profile=gl%3Dcore&api=gles1%3Dnone&profile=gles1%3Dcommon&api=gles2%3Dnone&api=glsc2%3Dnone&api=glx%3Dnone&api=vulkan%3Dnone&api=wgl%3Dnone&options=LOADER https://gen.glad.sh/generate OUTPUT_VARIABLE res)
-                string(REGEX MATCH "[Ll]ocation: ([A-Za-z0-9_\\:/\\.]+)" location ${res})
-                set(location "${CMAKE_MATCH_1}")
-                if (NOT location)
-                    message(STATUS "Could not extract location from http response, using included version of the glad loader (gl 4.5/core)")
+                execute_process(
+                        COMMAND ${IGG_CURL} -s -D - -X POST -d generator=c&api=egl%3Dnone&api=gl%3D${IGG_GLAD_GL_VERSION}&profile=gl%3D${GLAD_GL_PROFILE}&api=gles1%3Dnone&profile=gles1%3Dcommon&api=gles2%3Dnone&api=glsc2%3Dnone&api=glx%3Dnone&api=vulkan%3Dnone&api=wgl%3Dnone&options=LOADER https://gen.glad.sh/generate
+                        OUTPUT_VARIABLE out
+                        RESULT_VARIABLE res
+                        ERROR_VARIABLE err
+                )
+                if (NOT res EQUAL "0")
+                    message(WARNING "${IGG_CURL} returned: " ${res})
+                    if (err)
+                        message(WARNING "Error message: " ${err})
+                    endif ()
+                    message(STATUS "Using included version of the glad loader sources (gl 4.5/core)")
                     set(glad_SOURCE_DIR glad)
                 else ()
-                    string(REGEX REPLACE "/$" "" location ${location})
-                    string(APPEND location "/glad.zip")
-                    if (NOT ${location} MATCHES "^http")
-                        string(PREPEND location "https://gen.glad.sh")
+                    string(REGEX MATCH "[Ll][Oo][Cc][Aa][Tt][Ii][Oo][Nn]: ([A-Za-z0-9_\\:/\\.]+)" location ${out})
+                    set(location "${CMAKE_MATCH_1}")
+                    if (NOT location OR location STREQUAL "/")
+                        message(WARNING "Could not extract location from http response, using included version of the glad loader sources (gl 4.5/core)")
+                        message(STATUS "Response: " ${out})
+                        set(glad_SOURCE_DIR glad)
+                    else ()
+                        string(REGEX REPLACE "/$" "" location ${location})
+                        string(APPEND location "/glad.zip")
+                        if (NOT ${location} MATCHES "^http")
+                            string(PREPEND location "https://gen.glad.sh")
+                        endif ()
+                        message(STATUS "Downloading glad loader sources for gl${IGG_GLAD_GL_VERSION}/${GLAD_GL_PROFILE} from ${location}")
+                        FetchContent_Declare(
+                                glad
+                                URL ${location}
+                        )
+                        FetchContent_MakeAvailable(glad)
+                        set(glad_INSTALLED_VERSION ${IGG_GLAD_GL_VERSION}-${GLAD_GL_PROFILE} CACHE INTERNAL "")
+                        set(glad_LAST_SOURCE_DIR ${glad_SOURCE_DIR} CACHE INTERNAL "")
                     endif ()
-                    message(STATUS "Downloading glad for gl ${IGG_GLAD_GL_VERSION}/${GLAD_GL_PROFILE} from ${location} ")
-                    FetchContent_Declare(
-                            glad
-                            URL ${location}
-                    )
-                    FetchContent_MakeAvailable(glad)
-                    set(glad_INSTALLED_VERSION ${IGG_GLAD_GL_VERSION}-${GLAD_GL_PROFILE} CACHE INTERNAL "")
-                    set(glad_LAST_SOURCE_DIR ${glad_SOURCE_DIR} CACHE INTERNAL "")
                 endif ()
             endif ()
         endif ()
