@@ -120,12 +120,14 @@ if (IMPORT_GLAD)
 endif ()
 
 if (IMPORT_GLFW)
-    FetchContent_Declare(
-            glfw
-            GIT_REPOSITORY https://github.com/glfw/glfw.git
-            GIT_TAG ${IGG_GLFW_TAG}
-    )
-    list(APPEND components glfw)
+    if (NOT EMSCRIPTEN)
+        FetchContent_Declare(
+                glfw
+                GIT_REPOSITORY https://github.com/glfw/glfw.git
+                GIT_TAG ${IGG_GLFW_TAG}
+        )
+        list(APPEND components glfw)
+    endif ()
 endif ()
 
 if (IMPORT_GLM)
@@ -163,8 +165,11 @@ if (IMPORT_IMGUI)
             ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
             ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.h
     )
-    target_link_libraries(imgui PUBLIC glfw glad)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIMGUI_IMPL_OPENGL_LOADER_GLAD2")
+
+    target_link_libraries(imgui PUBLIC glad)
+    if (NOT EMSCRIPTEN)
+        target_link_libraries(imgui PUBLIC glfw)
+    endif ()
     target_include_directories(
             imgui
             PUBLIC
