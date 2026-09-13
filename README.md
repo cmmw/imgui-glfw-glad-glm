@@ -93,23 +93,33 @@ cmake -S . -B build -DFETCHCONTENT_QUIET=OFF
 
 ## Reducing configuration time
 
-The first time cmake is executed to generate the build system will take some time since all the components specified in
-the `IGG_COMPONENTS` variable (except glad if selected otherwise) have to be downloaded. Further reconfigurations will
-not download anything if not necessary but populating the projects will still take some time.
+The first time CMake is executed to generate the build system, it may take some time because all components specified in
+the `IGG_COMPONENTS` variable (except `glad`, if selected otherwise) have to be downloaded and populated. Subsequent
+reconfigurations will generally not download the dependencies again, but `FetchContent` may still perform update/check
+operations, which can take some time.
 
-To avoid this the CMake variable `FETCHCONTENT_FULLY_DISCONNECTED`  can be set `ON`. This will prevent CMake to update
-or download any content. Be careful if you use `FetchContent` anywhere else in your project and conduct the CMake
-documentation to understand the implications.
-Alternatively, `FETCHCONTENT_UPDATES_DISCONNECTED_<uppercaseName>` can be set per component to disabled updates. These
-variables will be cached, it is sufficient to set them once after the initial generation of the build system.
+To avoid these update operations, the CMake variable `FETCHCONTENT_UPDATES_DISCONNECTED` can be set to `ON`. This
+prevents `FetchContent` from checking for updates to already-populated dependencies, while still allowing dependencies
+that have not yet been populated to be downloaded. Alternatively, `FETCHCONTENT_UPDATES_DISCONNECTED_<uppercaseName>`
+can be set for individual components.
 
-Disabling updates for GLFW:
+`FETCHCONTENT_FULLY_DISCONNECTED` is a stronger alternative. When set to `ON`, CMake assumes that all required content
+has already been populated and will not attempt to download or update it. Be careful when using this option if
+`FetchContent` is used elsewhere in the project, and consult the CMake documentation to understand its implications.
+
+**Disabling updates globally:**
+
+```shell
+cmake -S . -B build -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
+```
+
+**Disabling updates for GLFW:**
 
 ```shell
 cmake -S . -B build -DFETCHCONTENT_UPDATES_DISCONNECTED_GLFW=ON
 ```
 
-Disabling updates and downloads for every dependency imported with `FetchContent`:
+**Preventing `FetchContent` from attempting to populate or update any dependency:**
 
 ```shell
 cmake -S . -B build -DFETCHCONTENT_FULLY_DISCONNECTED=ON
