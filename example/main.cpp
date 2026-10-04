@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <implot.h>
 #include <iostream>
 #include <thread>
 
@@ -117,6 +118,7 @@ int main(int argc, char *argv[]) {
    */
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
+  ImPlot::CreateContext();
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 450 core");
   ImGui::StyleColorsClassic();
@@ -211,13 +213,20 @@ int main(int argc, char *argv[]) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    static bool showDemo = false;
+    static bool showImGuiDemo = false;
+    static bool showImPlotDemo = false;
     ImGui::Begin("Example");
     if (ImGui::Button("Show/Hide ImGui demo"))
-      showDemo = !showDemo;
+      showImGuiDemo = !showImGuiDemo;
+    if (ImGui::Button("Show/Hide ImPlot demo"))
+      showImPlotDemo = !showImPlotDemo;
     ImGui::End();
-    if (showDemo)
-      ImGui::ShowDemoWindow(&showDemo);
+
+    if (showImGuiDemo)
+      ImGui::ShowDemoWindow(&showImGuiDemo);
+
+    if (showImPlotDemo)
+      ImPlot::ShowDemoWindow(&showImPlotDemo);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -230,6 +239,7 @@ int main(int argc, char *argv[]) {
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
+  ImPlot::DestroyContext();
   ImGui::DestroyContext();
 
   glfwDestroyWindow(window);

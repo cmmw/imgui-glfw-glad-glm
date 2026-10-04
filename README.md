@@ -1,44 +1,78 @@
-# imgui-glfw-glad
+# imgui-glfw-glad-glm
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
-A CMake project for [GLFW](https://github.com/glfw/glfw)
-, [Glad](https://gen.glad.sh/), [ImGui](https://github.com/ocornut/imgui) and
-[glm](https://github.com/g-truc/glm).
+A CMake dependency wrapper
+for [GLFW](https://github.com/glfw/glfw), [Glad](https://gen.glad.sh/), [ImGui](https://github.com/ocornut/imgui), [ImPlot](https://github.com/epezent/implot),
+and [GLM](https://github.com/g-truc/glm).
 
-This project is meant to simplify the import of the OpenGL related libraries GLFW, ImGui, Glad and glm. ImGui, GLFW and
-glm are imported via CMake's FetchContent. Additionally, a target is created for ImGui which is built with the glfw
-backend and using glad's loader. The gl extensions are generated and downloaded from https://gen.glad.sh/ during
-configuration. A fallback version of glad's gl extensions for gl version 4.5 core profile is included in this project
-and will be used in case curl is not available.
+This project simplifies fetching and building these libraries with CMake's `FetchContent`. ImGui is built with the GLFW
+platform backend and the OpenGL3 renderer backend; ImPlot publicly links ImGui. On desktop, the `imgui` target also
+publicly links GLFW, making it available to consumers.
 
-There are a number of cache variables to customize the behaviour of the dependency import:
+By default, Glad loader sources for the requested OpenGL version/profile are generated and downloaded
+from https://gen.glad.sh/ during configuration. Set `IGG_GLAD_USE_BUNDLED=ON` to use the included OpenGL 4.5 core loader
+instead. Bundled mode ignores the requested OpenGL version/profile. It is an explicit choice, not an automatic fallback
+when curl is unavailable.
 
-| Variable            | Type   | Default             | Description                                        |
-|---------------------|--------|---------------------|----------------------------------------------------|
-| IGG_COMPONENTS      | list   | IMGUI;GLFW;GLAD;GLM | The components to import                           |
-| IGG_GLAD_DOWNLOAD   | bool   | ON                  | Download glad or use fallback version              |
-| IGG_GLAD_GL_CORE    | bool   | ON                  | If gl core or compatibility profile should be used |
-| IGG_GLAD_GL_VERSION | string | 4.5                 | The gl version used by the glad loader generator   |
-| IGG_IMGUI_TAG       | string | master              | The git tag of the ImGui project to import         |
-| IGG_GLFW_TAG        | string | master              | The git tag of the GLFW project to import          |
-| IGG_GLM_TAG         | string | master              | The git tag of the glm project to import           |
+## Requirements
 
-## Example
+* CMake >= 3.25
+* curl (for generating Glad sources)
 
-In order to use the libraries, simply include this project with CMake's
-FetchContent:
+## Configuration
+
+Set these cache variables before making this project available through `FetchContent` or `add_subdirectory()`:
+
+| Variable               | Type     | Default  | Description                                                                  |
+|------------------------|----------|----------|------------------------------------------------------------------------------|
+| `IGG_ENABLE_IMGUI`     | `bool`   | `ON`     | Create the `imgui` target; enables GLFW.                                     |
+| `IGG_ENABLE_IMPLOT`    | `bool`   | `OFF`    | Create the `implot` target; automatically enables ImGui.                     |
+| `IGG_ENABLE_GLFW`      | `bool`   | `ON`     | Provide the `glfw` target.                                                   |
+| `IGG_ENABLE_GLAD`      | `bool`   | `ON`     | Create the `glad` target; disabled under Emscripten.                         |
+| `IGG_ENABLE_GLM`       | `bool`   | `ON`     | Provide the `glm` target.                                                    |
+| `IGG_GLAD_USE_BUNDLED` | `bool`   | `OFF`    | Use bundled OpenGL 4.5 core sources, ignoring the requested version/profile. |
+| `IGG_GLAD_GL_VERSION`  | `string` | `4.5`    | OpenGL version to generate.                                                  |
+| `IGG_GLAD_GL_PROFILE`  | `string` | `core`   | OpenGL profile: `core` or `compatibility`.                                   |
+| `IGG_IMGUI_TAG`        | `string` | `master` | ImGui Git tag, branch, or commit hash.                                       |
+| `IGG_IMPLOT_TAG`       | `string` | `master` | ImPlot Git tag, branch, or commit hash.                                      |
+| `IGG_GLFW_TAG`         | `string` | `master` | GLFW Git tag, branch, or commit hash; unused under Emscripten.               |
+| `IGG_GLM_TAG`          | `string` | `master` | GLM Git tag, branch, or commit hash.                                         |
+
+Enabling ImGui overrides the GLFW flag to `ON`. Enabling ImPlot automatically enables ImGui.
+
+Under Emscripten, `glfw` is an interface target that propagates `-sUSE_GLFW=3` and `-sMAX_WEBGL_VERSION=2`
+to the linker. Native GLFW is not downloaded, and Glad is neither built nor linked since Emscripten provides its own
+OpenGL (WebGL) implementation.
+
+### Deprecated options
+
+| Variable           | Type   | Default | Replacement                                                            |
+|--------------------|--------|---------|------------------------------------------------------------------------|
+| `IGG_COMPONENTS`   | `list` | Unset   | Use the individual `IGG_ENABLE_<COMPONENT>` flags.                     |
+| `IGG_GLAD_GL_CORE` | `bool` | Unset   | Use `IGG_GLAD_GL_PROFILE=core` for `ON`, or `compatibility` for `OFF`. |
+
+When supplied, `IGG_COMPONENTS` overrides the component flags with a case-insensitive, semicolon-separated list. Valid
+names are `IMGUI`, `IMPLOT`, `GLFW`, `GLAD`, and `GLM`; an empty list disables all components. Selecting ImPlot
+automatically enables ImGui.
+
+## Usage
+
+Include this project from your application's `CMakeLists.txt` using `FetchContent`:
 
 ```cmake
-include(FetchContent)
+cmake_minimum_required(VERSION 3.25)
+project(my_app LANGUAGES C CXX)
 
-# ...
+include(FetchContent)
 
 FetchContent_Declare(
         imgui-glfw-glad-glm
         GIT_REPOSITORY https://github.com/cmmw/imgui-glfw-glad-glm.git
         GIT_TAG master
 )
+
+set(IGG_ENABLE_IMPLOT ON CACHE BOOL "")
 
 FetchContent_MakeAvailable(imgui-glfw-glad-glm)
 
@@ -47,45 +81,70 @@ add_executable(
         main.cpp
 )
 
-# It is sufficient to only link glm and ImGui since the latter one already contains Glad and GLFW
+# ImPlot links ImGui and its dependencies already. 
 target_link_libraries(
         app
-        imgui
+        PRIVATE
+        implot
         glm
 )
+```
 
-# Otherwise link only Glad, GLFW and glm if ImGui is not needed
+If you only use ImGui, link `imgui` instead of `implot`. For an application that needs neither ImGui nor ImPlot, only
+link the required dependencies:
+
+```cmake
 target_link_libraries(
         app
+        PRIVATE
         glfw
         glad
         glm
 )
-
 ```
 
-The folder example provides a minimal, self-contained example program which includes this project via FetchContent and
-does all the necessary initialization of the components. In order to build it, execute the following commands from
-within the source folder:
+Linking fewer targets does not disable dependency imports. Set the corresponding configuration options to avoid
+fetching and building unused components.
+
+### Building the included example
+
+The `example` directory contains an application using ImGui, ImPlot, GLFW, Glad, and GLM. It fetches this project
+from GitHub using `FetchContent`. From inside the example directory, configure and build it with:
 
 ```shell
 cmake -S . -B build
-cmake --build build --target app -j4
+cmake --build build --target app --parallel 4
 ```
 
-If you want to define the version of a dependency:
+The example enables ImPlot and otherwise uses the fetched project’s default options. Its source code requires all five
+components. To use bundled Glad instead of generating and downloading loader sources, configure it with:
 
 ```shell
-cmake -S. -B build -DIGG_GLFW_TAG=v3.3.8 -DIGG_GLAD_GL_VERSION=4.6
+cmake -S . -B build -DIGG_GLAD_USE_BUNDLED=ON
 ```
 
-The list of the components to be imported has to be put in quotes and seperated by semicolons:
+### Configuring dependencies
+
+The following CMake commands demonstrate how to configure dependencies when building your own application that consumes this
+project. Run these commands from your application’s source directory, adjusting the options to its requirements.
 
 ```shell
-cmake -S . -B build -DIGG_COMPONENTS="GLM;GLFW"
+cmake -S . -B build -DIGG_GLFW_TAG=3.3.8 -DIGG_GLAD_GL_VERSION=4.6
 ```
 
-Sometimes it's handy to enable the output of FetchContent:
+With the default component settings, disable ImGui and Glad to leave only GLFW and GLM enabled:
+
+```shell
+cmake -S . -B build -DIGG_ENABLE_IMGUI=OFF -DIGG_ENABLE_GLAD=OFF
+```
+
+To use bundled Glad:
+
+```shell
+cmake -S . -B build -DIGG_GLAD_USE_BUNDLED=ON
+```
+
+To show FetchContent download and update output:
 
 ```shell
 cmake -S . -B build -DFETCHCONTENT_QUIET=OFF
@@ -93,19 +152,21 @@ cmake -S . -B build -DFETCHCONTENT_QUIET=OFF
 
 ## Reducing configuration time
 
-The first time CMake is executed to generate the build system, it may take some time because all components specified in
-the `IGG_COMPONENTS` variable (except `glad`, if selected otherwise) have to be downloaded and populated. Subsequent
-reconfigurations will generally not download the dependencies again, but `FetchContent` may still perform update/check
-operations, which can take some time.
+Initial configuration may take some time while enabled dependencies are downloaded. Bundled Glad and Emscripten's GLFW
+interface do not require source downloads through this project. Subsequent configurations reuse existing sources, but
+`FetchContent` may still check for updates.
 
-To avoid these update operations, the CMake variable `FETCHCONTENT_UPDATES_DISCONNECTED` can be set to `ON`. This
-prevents `FetchContent` from checking for updates to already-populated dependencies, while still allowing dependencies
-that have not yet been populated to be downloaded. Alternatively, `FETCHCONTENT_UPDATES_DISCONNECTED_<uppercaseName>`
-can be set for individual components.
+Set `FETCHCONTENT_UPDATES_DISCONNECTED=ON` to skip remote update checks while still allowing initial downloads.
+Use `FETCHCONTENT_UPDATES_DISCONNECTED_<UPPERCASE_NAME>` to control an individual dependency.
+Changes to dependency declarations can still require local update steps; behavior depends on the CMake version.
 
-`FETCHCONTENT_FULLY_DISCONNECTED` is a stronger alternative. When set to `ON`, CMake assumes that all required content
-has already been populated and will not attempt to download or update it. Be careful when using this option if
-`FetchContent` is used elsewhere in the project, and consult the CMake documentation to understand its implications.
+`FETCHCONTENT_FULLY_DISCONNECTED=ON` disables FetchContent downloads and updates and requires sources to be available
+already. It is not suitable for a fresh build without prepopulated sources. These settings affect other uses of
+FetchContent in the consuming project as well, please refer to the CMake documentation for a detailed explanation.
+
+**These settings do not control the explicit curl request used to generate Glad.** To avoid that request, use bundled
+Glad or retain matching cached generated sources. Bundled mode alone does not make the other dependencies available
+offline.
 
 **Disabling updates globally:**
 
@@ -119,15 +180,13 @@ cmake -S . -B build -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
 cmake -S . -B build -DFETCHCONTENT_UPDATES_DISCONNECTED_GLFW=ON
 ```
 
-**Preventing `FetchContent` from attempting to populate or update any dependency:**
+**Using existing dependency sources and bundled Glad without downloads:**
 
 ```shell
-cmake -S . -B build -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+cmake -S . -B build -DFETCHCONTENT_FULLY_DISCONNECTED=ON -DIGG_GLAD_USE_BUNDLED=ON
 ```
 
 ## License
 
-The content of this project (excluding 3rd party libraries) is licensed under
-the [MIT license](https://github.com/cmmw/imgui-glfw-glad/blob/master/LICENSE.md)
-. Please refer to the particular libraries homepage/repository for more
-information regarding licensing.
+This project's own code is licensed under the [MIT license](LICENSE.md). Third-party libraries retain their
+respective licenses; see each library's repository for details.
